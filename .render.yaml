@@ -2,8 +2,13 @@ services:
   - type: web
     name: text-editor-pwa
     env: node
-    region: oregon
-    buildCommand: "npm install && npm run build"
-    startCommand: "npm start"
     plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
     autoDeploy: true
+    regions:
+      - oregon
+      - frankfurt
