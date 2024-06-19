@@ -1,70 +1,36 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackPwaManifest = require('webpack-pwa-manifest');
-const path = require('path');
 const { InjectManifest } = require('workbox-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
 
-module.exports = () => {
-  return {
-    mode: 'development',
-    entry: {
-      main: './src/js/index.js',
-      install: './src/js/install.js',
-    },
-    output: {
-      filename: '[name].bundle.js',
-      path: path.resolve(__dirname, 'dist'),
-    },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
-        title: 'Text Editor',
-      }),
-      new InjectManifest({
-        swSrc: './src-sw.js',
-        swDest: 'src-sw.js',
-      }),
-      new WebpackPwaManifest({
-        fingerprints: false,
-        inject: true,
-        name: 'Text Editor',
-        short_name: 'JATE',
-        description: 'Just Another Text Editor!',
-        background_color: '#ffffff',
-        theme_color: '#ffffff',
-        start_url: '/',
-        publicPath: '/',
-        icons: [
-          {
-            src: path.resolve('src/images/icon-192x192.png'),
-            sizes: [192],
-            destination: path.join('assets', 'icons'),
-          },
-          {
-            src: path.resolve('src/images/icon-512x512.png'),
-            sizes: [512],
-            destination: path.join('assets', 'icons'),
-          },
-        ],
-      }),
+module.exports = {
+  entry: './src/js/index.js',
+  output: {
+    filename: 'main.bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  mode: 'development',
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
-    module: {
-      rules: [
-        {
-          test: /\.css$/i,
-          use: ['style-loader', 'css-loader'],
-        },
-        {
-          test: /\.m?js$/,
-          exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env'],
-              plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-runtime'],
-            },
-          },
-        },
-      ],
-    },
-  };
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      filename: 'index.html',
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: './src/images', to: 'images' }
+      ]
+    }),
+    new InjectManifest({
+      swSrc: './src-sw.js',
+      swDest: 'src-sw.js',
+    }),
+  ],
 };
